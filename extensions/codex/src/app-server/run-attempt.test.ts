@@ -6693,7 +6693,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
@@ -6732,7 +6731,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
@@ -6773,7 +6771,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       codexHome,
       config: {
@@ -6829,7 +6826,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
@@ -6882,7 +6878,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
@@ -6936,7 +6931,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
@@ -6979,7 +6973,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
@@ -7020,7 +7013,6 @@ describe("runCodexAppServerAttempt", () => {
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
       bindingIdentity: sessionFile,
-      sessionFile,
       agentDir,
       config: {
         agents: {
