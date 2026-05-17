@@ -618,6 +618,11 @@ describe("runCodexAppServerAttempt", () => {
       sessionId: "session-1",
       events: [],
     });
+    replaceSqliteSessionTranscriptEvents({
+      agentId: "main",
+      sessionId: "session",
+      events: [],
+    });
     vi.stubEnv("OPENCLAW_TRAJECTORY", "0");
     vi.stubEnv("CODEX_API_KEY", "");
     vi.stubEnv("OPENAI_API_KEY", "");
@@ -631,6 +636,11 @@ describe("runCodexAppServerAttempt", () => {
     replaceSqliteSessionTranscriptEvents({
       agentId: "main",
       sessionId: "session-1",
+      events: [],
+    });
+    replaceSqliteSessionTranscriptEvents({
+      agentId: "main",
+      sessionId: "session",
       events: [],
     });
     resetCodexAppServerClientFactoryForTest();
@@ -1111,10 +1121,7 @@ describe("runCodexAppServerAttempt", () => {
       }
       return undefined;
     });
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.disableTools = false;
     params.runtimePlan = createCodexRuntimePlanFixture();
     params.sourceReplyDeliveryMode = "message_tool_only";
@@ -1146,10 +1153,7 @@ describe("runCodexAppServerAttempt", () => {
         : []),
     ]);
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.disableTools = false;
     params.runtimePlan = createCodexRuntimePlanFixture();
     params.sourceReplyDeliveryMode = "message_tool_only";
@@ -1212,10 +1216,7 @@ describe("runCodexAppServerAttempt", () => {
       createRuntimeDynamicTool("sessions_yield"),
     ]);
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.disableTools = false;
     params.runtimePlan = createCodexRuntimePlanFixture();
     params.sourceReplyDeliveryMode = "message_tool_only";
@@ -1540,10 +1541,7 @@ describe("runCodexAppServerAttempt", () => {
       createRuntimeDynamicTool("web_search"),
     ]);
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.disableTools = false;
     params.runtimePlan = createCodexRuntimePlanFixture();
     params.sourceReplyDeliveryMode = "message_tool_only";
@@ -1964,11 +1962,7 @@ describe("runCodexAppServerAttempt", () => {
       createMockPluginRegistry([{ hookName: "after_tool_call", handler: afterToolCall }]),
     );
     __testing.setOpenClawCodingToolsFactoryForTests(() => [createRuntimeDynamicTool("echo")]);
-
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.disableTools = false;
     params.runtimePlan = createCodexRuntimePlanFixture();
     params.messageChannel = "telegram";
@@ -2078,10 +2072,7 @@ describe("runCodexAppServerAttempt", () => {
           },
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 60_000;
 
     const run = runCodexAppServerAttempt(params, {
@@ -2181,10 +2172,7 @@ describe("runCodexAppServerAttempt", () => {
 
   it("keeps a progressing active turn alive beyond the original attempt timeout", async () => {
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 100;
     const onRunProgress = vi.fn();
     params.onRunProgress = onRunProgress;
@@ -2250,10 +2238,7 @@ describe("runCodexAppServerAttempt", () => {
   it("does not count non-turn app-server requests as turn attempt progress", async () => {
     const harness = createStartedThreadHarness();
     const warn = vi.spyOn(embeddedAgentLog, "warn").mockImplementation(() => undefined);
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 100;
     const onRunProgress = vi.fn();
     params.onRunProgress = onRunProgress;
@@ -2303,10 +2288,7 @@ describe("runCodexAppServerAttempt", () => {
     vi.spyOn(authBridge, "refreshCodexAppServerAuthTokens").mockImplementation(
       async () => await new Promise<never>(() => undefined),
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 100;
 
     const run = runCodexAppServerAttempt(params, {
@@ -2350,10 +2332,7 @@ describe("runCodexAppServerAttempt", () => {
       content: null,
       _meta: null,
     });
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 100;
     const onRunProgress = vi.fn();
     params.onRunProgress = onRunProgress;
@@ -2399,10 +2378,7 @@ describe("runCodexAppServerAttempt", () => {
 
   it("counts pending user input requests as turn attempt progress", async () => {
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 250;
     params.onBlockReply = vi.fn();
     const onRunProgress = vi.fn();
@@ -2464,10 +2440,7 @@ describe("runCodexAppServerAttempt", () => {
   it("does not count mismatched turn-scoped requests as turn attempt progress", async () => {
     const harness = createStartedThreadHarness();
     const warn = vi.spyOn(embeddedAgentLog, "warn").mockImplementation(() => undefined);
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 100;
 
     const run = runCodexAppServerAttempt(params, {
@@ -2637,10 +2610,7 @@ describe("runCodexAppServerAttempt", () => {
           },
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 60_000;
 
     const run = runCodexAppServerAttempt(params, {
@@ -2729,10 +2699,7 @@ describe("runCodexAppServerAttempt", () => {
           },
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 60_000;
 
     const run = runCodexAppServerAttempt(params, {
@@ -2916,10 +2883,7 @@ describe("runCodexAppServerAttempt", () => {
           },
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 60_000;
 
     const run = runCodexAppServerAttempt(params, {
@@ -2998,10 +2962,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 60_000;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3099,10 +3060,7 @@ describe("runCodexAppServerAttempt", () => {
           },
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 60_000;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3195,10 +3153,7 @@ describe("runCodexAppServerAttempt", () => {
 
   it("does not treat global rate-limit notifications as turn progress", async () => {
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, { turnCompletionIdleTimeoutMs: 15 });
@@ -3240,10 +3195,7 @@ describe("runCodexAppServerAttempt", () => {
 
   it("yields a macrotask before processing queued app-server notifications", async () => {
     const harness = createStartedThreadHarness();
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 1_000;
 
     const run = runCodexAppServerAttempt(params);
@@ -3283,10 +3235,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3358,10 +3307,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3441,10 +3387,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3532,10 +3475,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3612,10 +3552,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3688,10 +3625,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3765,10 +3699,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -3848,10 +3779,7 @@ describe("runCodexAppServerAttempt", () => {
           addRequestHandler: () => () => undefined,
         }) as never,
     );
-    const params = createParams(
-      path.join(tempDir, "session.jsonl"),
-      path.join(tempDir, "workspace"),
-    );
+    const params = createParams("session-1", path.join(tempDir, "workspace"));
     params.timeoutMs = 200;
 
     const run = runCodexAppServerAttempt(params, {
@@ -6651,7 +6579,7 @@ describe("runCodexAppServerAttempt", () => {
       agents: {
         defaults: {
           compaction: {
-            truncateAfterCompaction: true,
+            rotateAfterCompaction: true,
             maxActiveTranscriptBytes: "1mb",
           },
         },
@@ -6716,7 +6644,7 @@ describe("runCodexAppServerAttempt", () => {
       agents: {
         defaults: {
           compaction: {
-            truncateAfterCompaction: true,
+            rotateAfterCompaction: true,
             maxActiveTranscriptBytes: "1mb",
           },
         },
@@ -6764,13 +6692,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
             },
           },
         },
@@ -6802,13 +6731,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: "1k",
             },
           },
@@ -6842,6 +6772,7 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       codexHome,
@@ -6849,7 +6780,7 @@ describe("runCodexAppServerAttempt", () => {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: 1_000,
             },
           },
@@ -6897,13 +6828,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: "1mb",
             },
           },
@@ -6949,13 +6881,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: "1mb",
             },
           },
@@ -7002,13 +6935,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: "1mb",
             },
           },
@@ -7044,13 +6978,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: 1_000,
             },
           },
@@ -7084,13 +7019,14 @@ describe("runCodexAppServerAttempt", () => {
 
     const binding = await __testing.rotateOversizedCodexAppServerStartupBinding({
       binding: await readCodexAppServerBinding(sessionFile),
+      bindingIdentity: sessionFile,
       sessionFile,
       agentDir,
       config: {
         agents: {
           defaults: {
             compaction: {
-              truncateAfterCompaction: true,
+              rotateAfterCompaction: true,
               maxActiveTranscriptBytes: 1_000,
             },
           },
