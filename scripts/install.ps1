@@ -1043,10 +1043,18 @@ function Install-OpenClawFromGit {
         Push-Location -LiteralPath $RepoDir
         $pushedRepoLocation = $true
         & $pnpmCommand install
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[!] pnpm install failed for the Git checkout" -ForegroundColor Red
+            return $false
+        }
         if (-not (& $pnpmCommand ui:build)) {
             Write-Host "[!] UI build failed; continuing (CLI may still work)" -ForegroundColor Yellow
         }
         & $pnpmCommand build
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[!] pnpm build failed for the Git checkout" -ForegroundColor Red
+            return $false
+        }
     } finally {
         if ($pushedRepoLocation) {
             Pop-Location
@@ -1054,12 +1062,18 @@ function Install-OpenClawFromGit {
         $env:NPM_CONFIG_SCRIPT_SHELL = $prevPnpmScriptShell
     }
 
+    $entryPath = Join-Path $RepoDir "dist\\entry.js"
+    if (-not (Test-Path $entryPath)) {
+        Write-Host "[!] OpenClaw build did not produce $entryPath" -ForegroundColor Red
+        return $false
+    }
+
     $binDir = Join-Path $env:USERPROFILE ".local\\bin"
     if (-not (Test-Path $binDir)) {
         New-Item -ItemType Directory -Force -Path $binDir | Out-Null
     }
     $cmdPath = Join-Path $binDir "openclaw.cmd"
-    $cmdContents = "@echo off`r`nnode ""$RepoDir\\dist\\entry.js"" %*`r`n"
+    $cmdContents = "@echo off`r`nnode ""$entryPath"" %*`r`n"
     Set-Content -Path $cmdPath -Value $cmdContents -NoNewline
 
     $userPath = [Environment]::GetEnvironmentVariable("Path", "User")

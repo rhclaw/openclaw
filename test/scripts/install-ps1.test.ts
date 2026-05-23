@@ -249,7 +249,21 @@ describe("install.ps1 failure handling", () => {
     );
     expect(gitInstallBody).toContain("Push-Location -LiteralPath $RepoDir");
     expect(gitInstallBody).toContain("& $pnpmCommand install");
+    expect(gitInstallBody).toContain(
+      'Write-Host "[!] pnpm install failed for the Git checkout"',
+    );
+    expect(gitInstallBody).toContain("& $pnpmCommand build");
+    expect(gitInstallBody).toContain(
+      'Write-Host "[!] pnpm build failed for the Git checkout"',
+    );
+    expect(gitInstallBody).toContain('$entryPath = Join-Path $RepoDir "dist\\\\entry.js"');
+    expect(gitInstallBody).toContain("Test-Path $entryPath");
+    expect(gitInstallBody).toContain(
+      'Write-Host "[!] OpenClaw build did not produce $entryPath"',
+    );
+    expect(gitInstallBody).toContain('node ""$entryPath"" %*');
     expect(gitInstallBody).not.toContain("& $pnpmCommand -C $RepoDir install");
+    expect(gitInstallBody).not.toContain('node ""$RepoDir\\\\dist\\\\entry.js"" %*');
   });
 
   it("cleans legacy git submodules only from the selected git checkout", () => {
